@@ -1,0 +1,22 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700);
+
+body {
+	font-family: Lato;
+}
+main {
+	margin-top: 50px;
+	margin-left: 50px;
+}
+h2 {
+	font-weight: 700;
+}
+p, ul, li, a {
+	font-weight: 400;
+}
+a {
+	text-decoration: none;
+	color: black;
+}
+a:hover {
+	text-decoration: underline;
+}
