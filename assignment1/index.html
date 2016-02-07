@@ -48,7 +48,7 @@
 
       float x = vPosition.x;
       float y = vPosition.y;
-      float z = exp(cos(x * y + 100.)* sin(uTime + 2.5));
+      float z = exp(cos(x * y + 100.)* sin(uTime * 2.5));
 
       // CREATE A NEW COORDINATE SYSTEM THAT ROTATES IN TIME ABOUT THE Y AXIS.
       float u = x * acos(uTime) - z * asin(uCursor.x);
