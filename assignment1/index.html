@@ -1,0 +1,77 @@
+<!-- THIS WAS THE index.html THAT WE ENDED UP WITH BY THE END OF CLASS
+    EXCEPT THAT I HAVE ADDED SOME COMMENTS TO THE FRAG SHADER CODE.-->
+
+<script src=lib1.js></script>
+
+<body bgcolor=black>
+<center>
+<canvas id='canvas1' width='480' height='480'>
+</canvas>
+</center>
+</body>
+
+
+<!--=================================================================
+   VERTEX SHADER: runs once per triangle vertex.
+/-->
+
+<script id='vs' type='other'>
+   attribute vec3 aPosition;
+   varying   vec3 vPosition;
+   void main() {
+      gl_Position = vec4(aPosition, 1.0);
+      vPosition = aPosition;
+   }
+</script>
+
+
+<!--!=================================================================
+    FRAGMENT SHADER: runs once per pixel fragment.
+
+   Your assignment is to write your own interesting version of the
+   fragment shader program.  Try to have fun with it use "uTime"
+   to create animated patterns, and "uCursor" to make it responsive
+   to a user's mouse gestures.
+
+   DO NOT just hand in a variation of what I did in class!  I expect
+   you to create something original.  
+ /-->
+
+<script id='fs' type='other'>
+   precision mediump float;
+   uniform float uTime;
+   uniform vec3  uCursor;
+   varying vec3  vPosition;
+   void main() {
+
+      // GET THE X,Y LOCATION FROM vPosition, THEN COMPUTE z AS THOUGH ON A SPHERE.
+
+      float x = vPosition.x;
+      float y = vPosition.y;
+      float z = tan(x * y + 100.);
+
+      // CREATE A NEW COORDINATE SYSTEM THAT ROTATES IN TIME ABOUT THE Y AXIS.
+
+      float u = x * acos(uTime) - z * asin(uCursor.x);
+      float v = y;
+      float w = (x * sin(uTime) + z * atan(uCursor.y));
+
+      // CREATE A COOL PROCEDURAL TEXTURE.
+
+      float c = (w * sin(5. * (u + .03 * sin(30. * v)))
+                  * sin(5. * (v + .03 * sin(40. * u)))) * 0.5 + 0.5;
+      
+      // PUT THE RESULT INTO THE SYSTEM VARIABLE gl_FragColor.
+      //84,196,184   210,234,229
+
+      // 255,199,87 255,156,89
+
+      gl_FragColor = vec4(5.5 + .5 * w * 199., 18., .5 + 10.5 * w * 87., 1.);
+   }
+</script>
+
+
+<script>
+start_gl("canvas1", getStringFromScript('vs'), getStringFromScript('fs'));
+</script>
+
