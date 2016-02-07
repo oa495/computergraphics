@@ -48,25 +48,17 @@
 
       float x = vPosition.x;
       float y = vPosition.y;
-      float z = tan(x * y + 100.);
+      float z = exp(cos(x * y + 100.)* sin(uTime + 2.5));
 
       // CREATE A NEW COORDINATE SYSTEM THAT ROTATES IN TIME ABOUT THE Y AXIS.
-
       float u = x * acos(uTime) - z * asin(uCursor.x);
       float v = y;
       float w = (x * sin(uTime) + z * atan(uCursor.y));
 
       // CREATE A COOL PROCEDURAL TEXTURE.
-
-      float c = (w * sin(5. * (u + .03 * sin(30. * v)))
-                  * sin(5. * (v + .03 * sin(40. * u)))) * 0.5 + 0.5;
       
       // PUT THE RESULT INTO THE SYSTEM VARIABLE gl_FragColor.
-      //84,196,184   210,234,229
-
-      // 255,199,87 255,156,89
-
-      gl_FragColor = vec4(5.5 + .5 * w * 199., 18., .5 + 10.5 * w * 87., 1.);
+      gl_FragColor = vec4(5.5 + .5 * w * 199., 30., .5 + 100.5 * w * 87., 1.);
    }
 </script>
 
