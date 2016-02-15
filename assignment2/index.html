@@ -27,12 +27,18 @@
    // IF THERE IS NO INTERSECTION, RETURN 10000.
 
    float raySphere(vec3 V, vec3 W, vec4 sph) {
-
+      vec3 D = V - sph.xyz;
       // YOU NEED TO COMPUTE t, BY SETTING UP AND THEN SOLVING A QUADRATIC EQUATION.
       // AS DESCRIBED IN THE COURSE NOTES.
       // REMEMBER THAT THE SPHERE RADIUS IS FOUND IN sph.w.
-
-      return 10000.;             // RETURN THIS VALUE WHEN THE RAY MISSES THE SPHERE.
+      float a = dot(W, W);
+      float b = 2. * dot(W, D);
+      float c = dot(D, D) - (sph.w * sph.w); 
+      //quadratic formula
+      float t = (-b + sqrt(b*b - 4.*a*c))/ (2.*a);
+      if (t > 0.) 
+         return t;
+      else return 10000.;             // RETURN THIS VALUE WHEN THE RAY MISSES THE SPHERE.
    }
 
    // FOR NOW, WE WILL JUST SHADE THE SPHERE BY USING THE SURFACE NORMAL.
@@ -50,7 +56,9 @@
       // USING vPosition.x AND vPosition.y.
 
       vec3 V, W;
-
+      V = vec3(0., 0., 0.);
+      W = vec3(vPosition.x, vPosition.y, 2.);
+      sphere = vec4(.006, .014, .5, .15);
       // YOU NEED TO SET x,y,z AND r FOR sphere.
 
       vec3 color = vec3(0., 0., .1);         // BACKGROUND COLOR
