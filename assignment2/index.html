@@ -77,7 +77,7 @@
       // YOU NEED TO SET x,y,z AND r FOR sphere.
 
       vec3 color = vec3(0.8, 0.8, .05);         // BACKGROUND COLOR
-       for (int i = 0 ; i < 4 ; i++) { // and also the size of the loop.
+       for (int i = 0 ; i < 3 ; i++) { // and also the size of the loop.
          float t = raySphere(V, W, spheres[i]);
           if (t < 10000.)
              color = shadeSphere(V + t * W, spheres[i]);
