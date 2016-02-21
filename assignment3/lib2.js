@@ -104,6 +104,10 @@ function gl_init(gl, vertexShader, fragmentShader) {
    gl.uNLights = gl.getUniformLocation(program, "uNLights");
    gl.uTest    = gl.getUniformLocation(program, "uTest"   );
    gl.uTime    = gl.getUniformLocation(program, "uTime"   );
+   gl.uSpecularColor   = gl.getUniformLocation(program, "uSpecularColor"   );
+   gl.uDiffuseColor    = gl.getUniformLocation(program, "uDiffuseColor"   );
+   gl.uAmbientColor    = gl.getUniformLocation(program, "uAmbientColor"   );
+   gl.uSpecularPower    = gl.getUniformLocation(program, "uSpecularPower"   );
 }
 
 // gl_update() is called once per animation frame.
