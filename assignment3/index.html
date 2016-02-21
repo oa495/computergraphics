@@ -102,11 +102,11 @@
       vec3 normal = (point - sphere.xyz) / sphere.w;
       vec3 shade = ambient;
       vec3 R;
+      vec3 E = -(normalize(vec3(vPosition.xy, -3.))); 
       for (int i = 0 ; i < 20 ; i++)
            if (i < uNLights)
-             R += 2 * normal * dot(normal, uLDir[i]) - uLDir[i];
+             R += 2. * normal * dot(normal, uLDir[i]) - uLDir[i];
 
-      vec3 E = -(normalize(vec3(vPosition.xy, -3.))); 
       float specularPower = .3;
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
@@ -114,7 +114,6 @@
       for (int i = 0 ; i < 20 ; i++)
          if (i < uNLights)
             shade += lColor[i] * (diffuse * max(0., dot(normal, uLDir[i])) + specular * pow(max(0., dot(E, R)), specularPower));
-
       return shade;
    }
 
