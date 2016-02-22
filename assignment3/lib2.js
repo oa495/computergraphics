@@ -104,10 +104,10 @@ function gl_init(gl, vertexShader, fragmentShader) {
    gl.uNLights = gl.getUniformLocation(program, "uNLights");
    gl.uTest    = gl.getUniformLocation(program, "uTest"   );
    gl.uTime    = gl.getUniformLocation(program, "uTime"   );
-   gl.uSpecularColor   = gl.getUniformLocation(program, "uSpecularColor"   );
-   gl.uDiffuseColor    = gl.getUniformLocation(program, "uDiffuseColor"   );
-   gl.uAmbientColor    = gl.getUniformLocation(program, "uAmbientColor"   );
-   gl.uSpecularPower    = gl.getUniformLocation(program, "uSpecularPower"   );
+   //gl.uSpecularColor   = gl.getUniformLocation(program, "uSpecularColor"   );
+   //gl.uDiffuseColor    = gl.getUniformLocation(program, "uDiffuseColor"   );
+   //gl.uAmbientColor    = gl.getUniformLocation(program, "uAmbientColor"   );
+   //gl.uSpecularPower    = gl.getUniformLocation(program, "uSpecularPower"   );
 }
 
 // gl_update() is called once per animation frame.
@@ -130,7 +130,10 @@ function gl_update(gl) {
    gl.uniform1i (gl.uNLights, nLights);                               // Set number of lights uniform variable.
    gl.uniform1f (gl.uTest   , testValue);                             // Set a test uniform variable.
    gl.uniform1f (gl.uTime   , time);                                  // Set time uniform variable.
-
+   //gl.uniform3fv(gl.uSpecularColor, specular);
+   //gl.uniform3fv(gl.uAmbientColor, ambient);
+   //gl.uniform3fv(gl.uDiffuseColor, diffuse);
+   //gl.uniform1f(gl.uSpecularPower, specularPower);
    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);                          // Render the square.
    requestAnimFrame(function() { gl_update(gl); });                 // Start the next frame.
 }

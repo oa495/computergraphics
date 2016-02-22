@@ -30,6 +30,8 @@
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
 
+
+
    var update = function() {
 
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
@@ -68,23 +70,23 @@
    uniform float uTime;
    uniform int   uNLights;   // WE ADDED THIS UNIFORM
    varying vec3  vPosition;
-   uniform vec3 uSpecularColor;
-   uniform vec3 uDiffuseColor;
-   uniform vec3 uAmbientColor;
-   uniform float uSpecularPower;
+  // uniform vec3 uSpecularColor;
+   //uniform vec3 uDiffuseColor;
+   //uniform vec3 uAmbientColor;
+   //uniform float uSpecularPower;
    // FOR EXTRA CREDIT: IMPLEMENT MULTIPLE SPHERES.
 
    vec4 spheres[4];
 
    // ambient AND diffuse, BELOW, ARE SUFFICIENT TO CREATE ONLY DIFFUSE MATERIALS.
+   vec3 ambient;
+   vec3 specular;
+   vec3 diffuse;
 
    // YOU NEED TO ADD specular AND power TO IMPLEMENT THE PHONG SHADING ALGORITHM.
    // FOR EXTRA CREDIT, YOU CAN MAKE THESE ARRAYS TO IMPLEMENT MULTIPLE MATERIALS.
 
    vec3 lColor[2];
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
    // COMPUTE THE INTERSECTION OF A RAY WITH A SPHERE, IF ANY.
 
    float raySphere(vec3 V, vec3 W, vec4 sph) {
@@ -121,10 +123,9 @@
       lColor[0] = vec3(.6,.6,1.);
       lColor[1] = vec3(.15,.15,.06);
 
-      //spheres[0] = vec4(0., 0., -3., .08);
-      spheres[1] = vec4(0., 0., -3., .25);
-      spheres[2] = vec4(1., 0., -4, .15);
-      spheres[3] = vec4(-1., 0., -4, .15);
+      spheres[0] = vec4(0., 0., -3., .25);
+      spheres[1] = vec4(1., 0., -5, .18);
+      spheres[2] = vec4(-1., 0., -5, .18);
 
       ambient = vec3(.1, .1, .1);
       diffuse = vec3(.9, .9, .9);
@@ -136,7 +137,7 @@
       vec3 W = normalize(vec3(vPosition.xy, -3.));
 
       vec3 color = vec3(.05, .05, .05);         // BACKGROUND COLOR
-      for (int i = 0 ; i < 4 ; i++) {
+      for (int i = 0 ; i < 3 ; i++) {
          float t = raySphere(V, W, spheres[i]);
          if (t < 10000.)
             color = shadeSphere(V + t * W, spheres[i]);
