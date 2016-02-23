@@ -108,6 +108,11 @@ function gl_init(gl, vertexShader, fragmentShader) {
    gl.uDiffuseColor    = gl.getUniformLocation(program, "uDiffuseColor"   );
    gl.uAmbientColor    = gl.getUniformLocation(program, "uAmbientColor"   );
    gl.uSpecularPower    = gl.getUniformLocation(program, "uSpecularPower"   );
+   gl.uSpheres = gl.getUniformLocation(program, "uSpheres"   );
+   gl.uNSpheres = gl.getUniformLocation(program, "uNSpheres"   );
+   gl.uMaterials = gl.getUniformLocation(program, "uMaterials"   );
+
+
 }
 
 // gl_update() is called once per animation frame.
@@ -134,6 +139,9 @@ function gl_update(gl) {
    gl.uniform3fv(gl.uAmbientColor, ambient);
    gl.uniform3fv(gl.uDiffuseColor, diffuse);
    gl.uniform1f(gl.uSpecularPower, specularPower);
+   gl.uniform1i(gl.uNSpheres, nSpheres);
+   gl.uniform4fv(gl.uSpheres, sphereCoords);
+   gl.uniform3fv(gl.uMaterials, materials);
    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);                          // Render the square.
    requestAnimFrame(function() { gl_update(gl); });                 // Start the next frame.
 }

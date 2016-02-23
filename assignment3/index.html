@@ -27,10 +27,13 @@
    // A TEST VARIABLE, JUST FOR PRACTICING DECLARING AND SETTING UNIFORM SHADER VARIABLES.
 
    var testValue = 0;
-   var specular;
-   var ambient;
-   var diffuse;
+   var specular = [.2, .2, .2];
+   var ambient = [.1, .1, .1];
+   var diffuse = [.9, .9, .9];
    var specularPower = .3;
+   var nSpheres = 3;
+   var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18, -1., 0., -5, .18];
+   var materials = [0.012, 0.4, 0.78, 1., .0045, .9, .245, .15, .8];
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
 
 
@@ -40,20 +43,21 @@
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
 
       var x = Math.sin(Math.PI * time);
-
+      var sx1 =  Math.abs(Math.sin(time))-.5;
+      var sx2 = Math.abs(Math.sin(time))-1;
+      var sx3 = Math.sin(time);
       var lDir0 = [x,1,1];
       var lDir1 = [-1,-1,-1];
       normalize(lDir0);
       normalize(lDir1);
-
+      for (var i = 0; i < materials.length; i++) {
+         materials[i] *= Math.sin(i * time);
+      }
       lDirValues = [];
-      lDirValues.push(lDir0[0], lDir0[1], lDir0[2]);
-      lDirValues.push(lDir1[0], lDir1[1], lDir1[2]);
-
+      lDirValues.push(lDir0[0]*.2, lDir0[1], lDir0[2]*.124);
+      lDirValues.push(lDir1[0], lDir1[1]*1.2, lDir1[2]);
+      sphereCoords = [sx1, 0., -3., .25, sx2, 0., -5, .18, sx3, 0., -5, .18];
       // THIS IS JUST A TEST VALUE THAT WE CREATED FOR PRACTICE.
-      specular = [.2, .2, .2];
-      ambient = [.1, .1, .1];
-      diffuse = [.9, .9, .9];
       testValue = .5 + .5 * Math.sin(2 * time);
    }
 </script>
@@ -79,9 +83,12 @@
    uniform vec3 uDiffuseColor;
    uniform vec3 uAmbientColor;
    uniform float uSpecularPower;
+   uniform vec4 uSpheres[3];
+   uniform int uNSpheres;
+   uniform vec3 uMaterials[3];
    // FOR EXTRA CREDIT: IMPLEMENT MULTIPLE SPHERES.
 
-   vec4 spheres[4];
+  // vec4 spheres[4];
 
    // ambient AND diffuse, BELOW, ARE SUFFICIENT TO CREATE ONLY DIFFUSE MATERIALS.
 
@@ -101,7 +108,7 @@
 
    // YOU NEED TO CHANGE THIS TO USE THE PHONG SHADING ALGORITHM.
 
-   vec3 shadeSphere(vec3 point, vec4 sphere) {
+   vec3 shadeSphere(vec3 point, vec4 sphere, vec3 material) {
       vec3 normal = (point - sphere.xyz) / sphere.w;
       vec3 shade = uAmbientColor;
       vec3 R;
@@ -115,7 +122,7 @@
 
       for (int i = 0 ; i < 20 ; i++)
          if (i < uNLights)
-            shade += lColor[i] * (uDiffuseColor * max(0., dot(normal, uLDir[i])) + uSpecularColor * pow(max(0., dot(E, R)), uSpecularPower));
+            shade += lColor[i] * (atan(uDiffuseColor/material) * max(0., dot(normal, uLDir[i])) + (uSpecularColor/material) * pow(max(0., dot(E, R)), uSpecularPower));
       return shade;
    }
 
@@ -124,9 +131,9 @@
       lColor[0] = vec3(.6,.6,1.);
       lColor[1] = vec3(.15,.15,.06);
 
-      spheres[0] = vec4(0., 0., -3., .25);
-      spheres[1] = vec4(1., 0., -5, .18);
-      spheres[2] = vec4(-1., 0., -5, .18);
+      //spheres[0] = vec4(0., 0., -3., .25);
+      //spheres[1] = vec4(1., 0., -5, .18);
+      //spheres[2] = vec4(-1., 0., -5, .18);
 
 
       // COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL, USING vPosition.x AND vPosition.y.
@@ -136,9 +143,9 @@
 
       vec3 color = vec3(.05, .05, .05);         // BACKGROUND COLOR
       for (int i = 0 ; i < 3 ; i++) {
-         float t = raySphere(V, W, spheres[i]);
+         float t = raySphere(V, W, uSpheres[i]);
          if (t < 10000.)
-            color = shadeSphere(V + t * W, spheres[i]);
+            color = shadeSphere(V + t * W, uSpheres[i], uMaterials[i]);
 
          color.r *= uTest; // SEE WHETHER TEST VALUE HAS BEEN PASSED CORRECTLY TO THE FRAGMENT SHADER.
 
