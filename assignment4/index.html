@@ -233,17 +233,26 @@
 
       vec3 V = vec3(0., 0., 0.);
       vec3 W = normalize(vec3(vPosition.xy, -3.));
+      float offset = .8;
+      vec3 point;
+      float t, ts;
 
       vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
       for (int i = 0 ; i < 3 ; i++) {
+        point = V + t * W;
+        vec3 Ws = uLDir[i];
+        vec3 Vs = point + offset;
+        // ts = raySphere(Vs, Ws, uSpheres[i]);
+        // if (ts < 10000.) {
+          //  color = shadeSphere(point, W, uSpheres[i], ts);
+         //}
          float t = raySphere(V, W, uSpheres[i]);
          if (t < 10000.)
-            color = shadeSphere(V + t * W, W, uSpheres[i]);
-
-         color = sqrt(color);                   // DO GAMMA CORRECTION.
-
-         gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1.
+            color = shadeSphere(V + t * W, W, uSpheres[i]); 
       }
+      color = sqrt(color);                   // DO GAMMA CORRECTION.
+
+      gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1. 
    }
 </script>
 
