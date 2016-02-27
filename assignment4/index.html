@@ -25,26 +25,52 @@
    var lDirValues;
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
+   var testValue = 0;
+   var specular = [.2, .2, .2];
+   var ambient = [.1, .1, .1];
+   var diffuse = [.9, .9, .9];
+   var specularPower = .3;
+   var nSpheres = 3;
+   var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18, -1., 0., -5, .18];
+   var materials = [0.012, 0.4, 0.78, 1., .0045, .9, .245, .15, .8];
 
    var update = function() {
 
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
 
-      var x = 1;//Math.sin(Math.PI * time);
-
+      var x = Math.sin(Math.PI * time);
+      var sx1 =  Math.abs(Math.sin(time))-.5;
+      var sx2 = Math.abs(Math.sin(time))-1;
+      var sx3 = Math.sin(time);
       var lDir0 = [x,1,1];
       var lDir1 = [-1,-1,-1];
       normalize(lDir0);
       normalize(lDir1);
-
+      for (var i = 0; i < materials.length; i++) {
+         materials[i] *= Math.sin(i * time);
+      }
       lDirValues = [];
-      lDirValues.push(lDir0[0], lDir0[1], lDir0[2]);
-      lDirValues.push(lDir1[0], lDir1[1], lDir1[2]);
+      lDirValues.push(lDir0[0]*.2, lDir0[1], lDir0[2]*.124);
+      lDirValues.push(lDir1[0], lDir1[1]*1.2, lDir1[2]);
+      sphereCoords = [sx1, 0., -3., .25, sx2, 0., -5, .18, sx3, 0., -5, .18];
+      // THIS IS JUST A TEST VALUE THAT WE CREATED FOR PRACTICE.
+      testValue = .5 + .5 * Math.sin(2 * time);
 
       // HERE WE ARE SETTING SOME UNIFORM VARIABLES THAT THE LIBRARY DOES NOT KNOW ABOUT.
 
       gl.uniform3fv(uVar('uLDir')   , lDirValues); // Set light directions uniform variable.
       gl.uniform1i (uVar('uNLights'), nLights);    // Set number of lights uniform variable.
+      gl.uniform3fv(uVar('uLDir')  , lDirValues);                            // Set light directions uniform variable.
+      gl.uniform1i (uVar('uNLights'), nLights);                               // Set number of lights uniform variable.
+      gl.uniform1f (uVar('uTest')   , testValue);                             // Set a test uniform variable.
+      gl.uniform1f (uVar('uTime')   , time);                                  // Set time uniform variable.
+      gl.uniform3fv(uVar('uSpecularColor'), specular);
+      gl.uniform3fv(uVar('uAmbientColor'), ambient);
+      gl.uniform3fv(uVar('uDiffuseColor'), diffuse);
+      gl.uniform1f(uVar('uSpecularPower'), specularPower);
+      gl.uniform1i(uVar('uNSpheres'), nSpheres);
+      gl.uniform4fv(uVar('uSpheres'), sphereCoords);
+      gl.uniform3fv(uVar('uMaterials'), materials);
    }
 </script>
 
@@ -121,13 +147,15 @@
 
    // NOTE: YOU SHOULD IMPLEMENT ALL THE FOLLOWING THINGS AS ARRAYS OF UNIFORM VARS.
 
-   vec3  ambient;
-   vec3  diffuse;
-   vec3  lColor[2];
-   vec3  specular;
-   vec4  sphere;
-   float power;
+   uniform vec3 uSpecularColor;
+   uniform vec3 uDiffuseColor;
+   uniform vec3 uAmbientColor;
+   uniform float uSpecularPower;
+   uniform vec4 uSpheres[3];
+   uniform int uNSpheres;
+   uniform vec3 uMaterials[3];
 
+    vec3 lColor[2];
    // COMPUTE THE INTERSECTION OF A RAY WITH A SPHERE, IF ANY.
 
    float raySphere(vec3 V, vec3 W, vec4 sph) {
@@ -174,21 +202,21 @@
 
       // MODULATE SPECULARITY BY EROSION TEXTURE.
 
-      vec3 shininess = max(0., .5 + tt) * specular;
+      vec3 shininess = max(0., .5 + tt) * uSpecularColor;
 
       //vec3 shade = ambient * mix(vec3(0.,0.,1.), vec3(1.,.5,0.), tt);
 
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
 
-      vec3 shade = ambient * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
+      vec3 shade = uAmbientColor * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
 
       for (int i = 0 ; i < 20 ; i++)
          if (i < uNLights) {
 	    vec3 R = 2. * dot(normal, uLDir[i]) * normal - uLDir[i];
-            shade += lColor[i] * (diffuse * max(0., dot(normal, uLDir[i])) +
-                                  shininess * pow(max(0., dot(-W, R)), power));
+            shade += lColor[i] * (uDiffuseColor * max(0., dot(normal, uLDir[i])) +
+                                  shininess * pow(max(0., dot(-W, R)), uSpecularPower));
          }
 
       return shade;
@@ -199,12 +227,6 @@
       lColor[0] = vec3(.6,.6,1.);
       lColor[1] = vec3(.1,.1,.04);
 
-      sphere = vec4(0., 0., -3., .85);
-
-      ambient = vec3(.1, .1, .1);
-      diffuse = vec3(.2, .2, .2);
-      specular = vec3(.5, .5, .5);
-      power = 20.;
 
       // COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL,
       // USING vPosition.x AND vPosition.y.
@@ -213,13 +235,15 @@
       vec3 W = normalize(vec3(vPosition.xy, -3.));
 
       vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
-      float t = raySphere(V, W, sphere);
-      if (t < 10000.)
-         color = shadeSphere(V + t * W, W, sphere);
+      for (int i = 0 ; i < 3 ; i++) {
+         float t = raySphere(V, W, uSpheres[i]);
+         if (t < 10000.)
+            color = shadeSphere(V + t * W, W, uSpheres[i]);
 
-      color = sqrt(color);                   // DO GAMMA CORRECTION.
+         color = sqrt(color);                   // DO GAMMA CORRECTION.
 
-      gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1.
+         gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1.
+      }
    }
 </script>
 
