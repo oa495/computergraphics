@@ -181,7 +181,7 @@
       return .5 + .5 * sin(10. * p.x + 10. * fractal(p));
    }
 
-   vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere) {
+   vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere, float ts) {
       vec3 normal = (point - sphere.xyz) / sphere.w;
 
       float c = cos(.3 * uTime), s = sin(.3 * uTime);
@@ -201,9 +201,10 @@
       float tt = 50. * t0;
 
       // MODULATE SPECULARITY BY EROSION TEXTURE.
-
-      vec3 shininess = max(0., .5 + tt) * uSpecularColor;
-
+      vec3 shininess;
+      if (ts < 10000.)
+          shininess = max(0., .5 + tt) * vec3(0., 0., 0.);
+      else shininess = max(0., .5 + tt) * uSpecularColor;
       //vec3 shade = ambient * mix(vec3(0.,0.,1.), vec3(1.,.5,0.), tt);
 
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
@@ -214,9 +215,20 @@
 
       for (int i = 0 ; i < 20 ; i++)
          if (i < uNLights) {
-	    vec3 R = 2. * dot(normal, uLDir[i]) * normal - uLDir[i];
-            shade += lColor[i] * (uDiffuseColor * max(0., dot(normal, uLDir[i])) +
-                                  shininess * pow(max(0., dot(-W, R)), uSpecularPower));
+            vec3 specular;
+            vec3 diffuse;
+            if (ts < 10000.) {
+               specular = uSpecularColor;
+               diffuse = uDiffuseColor;
+            }
+            else {
+               specular = vec3(0., 0., 0.);
+               diffuse = vec3(0., 0., 0.);
+            }
+         //replace L with -W for reflection
+   	    vec3 R = 2. * dot(normal, -W) * normal - (-W);
+               shade += lColor[i] * (diffuse * max(0., dot(normal, uLDir[i])) +
+                                     shininess * pow(max(0., dot(-W, R)), uSpecularPower));
          }
 
       return shade;
@@ -233,22 +245,26 @@
 
       vec3 V = vec3(0., 0., 0.);
       vec3 W = normalize(vec3(vPosition.xy, -3.));
-      float offset = .8;
+      float offset = .001;
       vec3 point;
       float t, ts;
 
       vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
+
       for (int i = 0 ; i < 3 ; i++) {
-        point = V + t * W;
+         t = raySphere(V, W, uSpheres[i]);
+         point = V + t * W;
+      }
+      for (int i = 0 ; i < 3 ; i++) {
         vec3 Ws = uLDir[i];
-        vec3 Vs = point + offset;
-        // ts = raySphere(Vs, Ws, uSpheres[i]);
-        // if (ts < 10000.) {
-          //  color = shadeSphere(point, W, uSpheres[i], ts);
-         //}
-         float t = raySphere(V, W, uSpheres[i]);
+        vec3 Vs = point + (offset * uLDir[i]);
+        ts = raySphere(Vs, Ws, uSpheres[i]);
+        if (ts < 10000.) {
+          color = shadeSphere(point, Ws, uSpheres[i], ts);
+         }
+         /*float t = raySphere(V, W, uSpheres[i]);
          if (t < 10000.)
-            color = shadeSphere(V + t * W, W, uSpheres[i]); 
+            color = shadeSphere(V + t * W, W, uSpheres[i]); */
       }
       color = sqrt(color);                   // DO GAMMA CORRECTION.
 
