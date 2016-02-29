@@ -259,7 +259,7 @@
         vec3 Ws = uLDir[i];
         vec3 Vs = point + (offset * uLDir[i]);
         ts = raySphere(Vs, Ws, uSpheres[i]);
-        if (ts < 10000.) {
+        if (t < 10000.) {
           color = shadeSphere(point, Ws, uSpheres[i], ts);
          }
          /*float t = raySphere(V, W, uSpheres[i]);
