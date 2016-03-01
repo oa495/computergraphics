@@ -15,7 +15,9 @@
       for (var i = 0 ; i < 3 ; i++)
          vec[i] /= norm;
    }
-
+   function clamp(min, max) {
+      return Math.min(Math.max(this, min), max);
+   }
    // SPECIFY HOW MANY LIGHT SOURCES FOR THE FRAGMENT SHADER TO LOOP THROUGH.
 
    var nLights = 2;
@@ -26,33 +28,31 @@
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
    var testValue = 0;
-   var specular = [.2, .2, .2];
-   var ambient = [.1, .1, .1];
-   var diffuse = [.9, .9, .9];
+   var specular = [.2, .2, .12];
+   var ambient = [.1, .2, .3];
+   var diffuse = [.9, .98, .9];
    var specularPower = .3;
-   var nSpheres = 3;
+   var nSpheres = 2;
    var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18, -1., 0., -5, .18];
-   var materials = [0.012, 0.4, 0.78, 1., .0045, .9, .245, .15, .8];
-
    var update = function() {
 
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
 
       var x = Math.sin(Math.PI * time);
-      var sx1 =  Math.abs(Math.sin(time))-.5;
-      var sx2 = Math.abs(Math.sin(time))-1;
-      var sx3 = Math.sin(time);
+      var sx1 =  Math.abs(Math.sin(time))-2.5;
+      var sx3 = Math.sin(time) * Math.tan(time);
       var lDir0 = [x,1,1];
       var lDir1 = [-1,-1,-1];
       normalize(lDir0);
       normalize(lDir1);
-      for (var i = 0; i < materials.length; i++) {
-         materials[i] *= Math.sin(i * time);
+      for (var i = 0; i < diffuse.length; i++) {
+         diffuse[i] *= Math.sin(i * time) + 0.5;
+         // ambient[i] *= Math.cos(i / time) + 0.5;
       }
       lDirValues = [];
-      lDirValues.push(lDir0[0]*.2, lDir0[1], lDir0[2]*.124);
-      lDirValues.push(lDir1[0], lDir1[1]*1.2, lDir1[2]);
-      sphereCoords = [sx1, 0., -3., .25, sx2, 0., -5, .18, sx3, 0., -5, .18];
+      lDirValues.push(lDir0[0]*.8, lDir0[1], lDir0[2]*.24);
+      lDirValues.push(lDir1[0], lDir1[1]/1.2, lDir1[2]);
+      sphereCoords = [0., 0., sx1, .25, sx3, 0, -5, .18];
       // THIS IS JUST A TEST VALUE THAT WE CREATED FOR PRACTICE.
       testValue = .5 + .5 * Math.sin(2 * time);
 
@@ -70,7 +70,6 @@
       gl.uniform1f(uVar('uSpecularPower'), specularPower);
       gl.uniform1i(uVar('uNSpheres'), nSpheres);
       gl.uniform4fv(uVar('uSpheres'), sphereCoords);
-      gl.uniform3fv(uVar('uMaterials'), materials);
    }
 </script>
 
@@ -151,13 +150,10 @@
    uniform vec3 uDiffuseColor;
    uniform vec3 uAmbientColor;
    uniform float uSpecularPower;
-   uniform vec4 uSpheres[3];
+   uniform vec4 uSpheres[2];
    uniform int uNSpheres;
-   uniform vec3 uMaterials[3];
 
    
-   vec4 sphere;
-
    vec3 lColor[2];
    // COMPUTE THE INTERSECTION OF A RAY WITH A SPHERE, IF ANY.
 
@@ -182,7 +178,7 @@
    // SOLID MARBLING TEXTURE FOR COLOR VARIATION
 
    float texture2(vec3 p) {
-      return .5 + .5 * sin(10. * p.x + 10. * fractal(p));
+      return .5 + .5 * tan(0.8 * p.x + 10. * fractal(p));
    }
 
    vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere, float ts) {
@@ -253,7 +249,7 @@
       vec3 point;
       float t, ts;
 
-      vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
+      vec3 color = vec3(1.850 ,0.,.02);         // BACKGROUND COLOR
 
       for (int i = 0 ; i < 20; i++) {
          if (i < uNSpheres){
