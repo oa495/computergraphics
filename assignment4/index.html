@@ -155,7 +155,10 @@
    uniform int uNSpheres;
    uniform vec3 uMaterials[3];
 
-    vec3 lColor[2];
+   
+   vec4 sphere;
+
+   vec3 lColor[2];
    // COMPUTE THE INTERSECTION OF A RAY WITH A SPHERE, IF ANY.
 
    float raySphere(vec3 V, vec3 W, vec4 sph) {
@@ -165,6 +168,7 @@
       float discr = b * b - 4. * c;
       return discr >= 0. ? (-b - sqrt(discr)) / 2. : 10000.;
    }
+
 
    // FRACTAL BUMP TEXTURE FOR EROSION
 
@@ -251,20 +255,21 @@
 
       vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
 
-      for (int i = 0 ; i < 3 ; i++) {
-         t = raySphere(V, W, uSpheres[i]);
-         point = V + t * W;
-      }
-      for (int i = 0 ; i < 3 ; i++) {
-        vec3 Ws = uLDir[i];
-        vec3 Vs = point + (offset * uLDir[i]);
-        ts = raySphere(Vs, Ws, uSpheres[i]);
-        if (t < 10000.) {
-          color = shadeSphere(point, Ws, uSpheres[i], ts);
+      for (int i = 0 ; i < 20; i++) {
+         if (i < uNSpheres){
+            t = raySphere(V, W, uSpheres[i]);
+            if (t < 10000.) {
+                point = V + t * W;
+            }
          }
-         /*float t = raySphere(V, W, uSpheres[i]);
-         if (t < 10000.)
-            color = shadeSphere(V + t * W, W, uSpheres[i]); */
+      }
+      for (int i = 0 ; i < 20; i++) {
+        if (i < uNSpheres) {
+           vec3 Ws = uLDir[i];
+           vec3 Vs = point + offset * uLDir[i];
+           ts = raySphere(Vs, Ws, uSpheres[i]);
+           color = shadeSphere(point, Ws, uSpheres[i], ts);
+         }
       }
       color = sqrt(color);                   // DO GAMMA CORRECTION.
 
