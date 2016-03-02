@@ -15,7 +15,6 @@
       for (var i = 0 ; i < 3 ; i++)
          vec[i] /= norm;
    }
-
    // SPECIFY HOW MANY LIGHT SOURCES FOR THE FRAGMENT SHADER TO LOOP THROUGH.
 
    var nLights = 2;
@@ -23,20 +22,22 @@
    // MAINTAIN AN ARRAY OF LIGHT DIRECTION VALUES.
 
    var lDirValues;
+
+   // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
+   var testValue = 0;
    var specular = [.5, .5, .5];
    var ambient = [.1, .1, .1];
    var diffuse = [.2, .2, .2];
    var specularPower = 20.;
    var nSpheres = 2;
-   var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18];
-   // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
-
+   var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18, -1., 0., -5, .18];
    var update = function() {
 
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
 
-      var x = 1;//Math.sin(Math.PI * time);
-
+      var x = Math.sin(Math.PI * time);
+     // var sx1 =  Math.abs(Math.sin(time))-2.5;
+      //var sx3 = Math.sin(time) * Math.tan(time);
       var lDir0 = [x,1,1];
       var lDir1 = [-1,-1,-1];
       normalize(lDir0);
@@ -45,15 +46,17 @@
       lDirValues = [];
       lDirValues.push(lDir0[0], lDir0[1], lDir0[2]);
       lDirValues.push(lDir1[0], lDir1[1], lDir1[2]);
+      //sphereCoords = [0., 0., sx1, .25, sx3, 0, -5, .18];
+      // THIS IS JUST A TEST VALUE THAT WE CREATED FOR PRACTICE.
+      testValue = .5 + .5 * Math.sin(2 * time);
 
       // HERE WE ARE SETTING SOME UNIFORM VARIABLES THAT THE LIBRARY DOES NOT KNOW ABOUT.
 
       gl.uniform3fv(uVar('uLDir')   , lDirValues); // Set light directions uniform variable.
       gl.uniform1i (uVar('uNLights'), nLights);    // Set number of lights uniform variable.
-      gl.uniform3fv(uVar('uLDir')   , lDirValues); // Set light directions uniform variable.
-      gl.uniform1i (uVar('uNLights'), nLights);    // Set number of lights uniform variable.
       gl.uniform3fv(uVar('uLDir')  , lDirValues);                            // Set light directions uniform variable.
       gl.uniform1i (uVar('uNLights'), nLights);                               // Set number of lights uniform variable.
+      gl.uniform1f (uVar('uTest')   , testValue);                             // Set a test uniform variable.
       gl.uniform1f (uVar('uTime')   , time);                                  // Set time uniform variable.
       gl.uniform3fv(uVar('uSpecularColor'), specular);
       gl.uniform3fv(uVar('uAmbientColor'), ambient);
@@ -78,7 +81,7 @@
 
    // PROCEDURAL SOLID TEXTURE PRIMITIVES: NOISE, FRACTAL AND TURBULENCE.
 
-   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
    vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
@@ -143,13 +146,9 @@
    uniform float uSpecularPower;
    uniform vec4 uSpheres[2];
    uniform int uNSpheres;
-   vec3  lColor[2];
-   /*vec3  ambient;
-   vec3  diffuse;
-   vec3  specular;
-   vec4  sphere;
-   float power;*/
 
+   
+   vec3 lColor[2];
    // COMPUTE THE INTERSECTION OF A RAY WITH A SPHERE, IF ANY.
 
    float raySphere(vec3 V, vec3 W, vec4 sph) {
@@ -159,6 +158,7 @@
       float discr = b * b - 4. * c;
       return discr >= 0. ? (-b - sqrt(discr)) / 2. : 10000.;
    }
+
 
    // FRACTAL BUMP TEXTURE FOR EROSION
 
@@ -172,10 +172,10 @@
    // SOLID MARBLING TEXTURE FOR COLOR VARIATION
 
    float texture2(vec3 p) {
-      return .5 + .5 * sin(10. * p.x + 10. * fractal(p));
+      return .5 + .5 * tan(0.8 * p.x + 10. * fractal(p));
    }
 
-   vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere) {
+   vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere, float ts) {
       vec3 normal = (point - sphere.xyz) / sphere.w;
 
       float c = cos(.3 * uTime), s = sin(.3 * uTime);
@@ -195,9 +195,10 @@
       float tt = 50. * t0;
 
       // MODULATE SPECULARITY BY EROSION TEXTURE.
-
-      vec3 shininess = max(0., .5 + tt) * uSpecularColor;
-
+      vec3 shininess;
+      if (ts < 10000.) //if it hits and object
+          shininess = max(0., .5 + tt) * vec3(0., 0., 0.);
+      else shininess = max(0., .5 + tt) * uSpecularColor;
       //vec3 shade = ambient * mix(vec3(0.,0.,1.), vec3(1.,.5,0.), tt);
 
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
@@ -208,9 +209,20 @@
 
       for (int i = 0 ; i < 20 ; i++)
          if (i < uNLights) {
-       vec3 R = 2. * dot(normal, uLDir[i]) * normal - uLDir[i];
-            shade += lColor[i] * (uDiffuseColor * max(0., dot(normal, uLDir[i])) +
-                                  shininess * pow(max(0., dot(-W, R)), uSpecularPower));
+            vec3 specular;
+            vec3 diffuse;
+            if (ts < 10000.) {
+               specular = uSpecularColor;
+               diffuse = uDiffuseColor;
+            }
+            else {
+               specular = vec3(0., 0., 0.);
+               diffuse = vec3(0., 0., 0.);
+            }
+         //replace L with -W for reflection
+   	    vec3 R = 2. * dot(normal, -W) * normal - (-W);
+               shade += lColor[i] * (diffuse * max(0., dot(normal, uLDir[i])) +
+                                     shininess * pow(max(0., dot(-W, R)), uSpecularPower));
          }
 
       return shade;
@@ -218,32 +230,40 @@
 
    void main(void) {
 
-     /* lColor[0] = vec3(.6,.6,1.);
+      lColor[0] = vec3(.6,.6,1.);
       lColor[1] = vec3(.1,.1,.04);
 
-      sphere = vec4(0., 0., -3., .85);
-
-      ambient = vec3(.1, .1, .1);
-      diffuse = vec3(.2, .2, .2);
-      specular = vec3(.5, .5, .5);
-      power = 20.;*/
 
       // COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL,
       // USING vPosition.x AND vPosition.y.
 
       vec3 V = vec3(0., 0., 0.);
       vec3 W = normalize(vec3(vPosition.xy, -3.));
+      float offset = .001;
+      vec3 point;
+      float t, ts;
 
-      vec3 color = vec3(0.,0.,.02);         // BACKGROUND COLOR
-      for (int i = 0 ; i < 2 ; i++) {
-         float t = raySphere(V, W, uSpheres[i]);
-         if (t < 10000.)
-            color = shadeSphere(V + t * W, W, uSpheres[i]);
+      vec3 color = vec3(1.850 ,0.,.02);         // BACKGROUND COLOR
+
+      for (int i = 0 ; i < 20; i++) {
+         if (i < uNSpheres){
+            t = raySphere(V, W, uSpheres[i]);
+            if (t < 10000.) {
+                point = V + t * W; //get the surface point
+            }
+         }
       }
-
+      for (int i = 0 ; i < 20; i++) {
+        if (i < uNSpheres) {
+           vec3 Ws = uLDir[i];
+           vec3 Vs = point + offset * uLDir[i];
+           ts = raySphere(Vs, Ws, uSpheres[i]);
+           color = shadeSphere(point, Ws, uSpheres[i], ts);
+         }
+      }
       color = sqrt(color);                   // DO GAMMA CORRECTION.
 
-      gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1.
+      gl_FragColor = vec4(color, 1.);        // SET OPACITY TO 1. 
    }
 </script>
 
