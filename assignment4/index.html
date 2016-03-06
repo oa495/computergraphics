@@ -25,10 +25,10 @@
    var lDirValues;
    var specular = [.5, .5, .5];
    var ambient = [.1, .1, .1];
-   var diffuse = [.2, .2, .2];
+   var diffuse = [.2, .2, .1];
    var specularPower = 20.;
    var nSpheres = 2;
-   var sphereCoords = [0., 0., -3., .25, 1., 0., -5, .18];
+   var sphereCoords = [];
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
 
    var update = function() {
@@ -45,7 +45,7 @@
       lDirValues = [];
       lDirValues.push(lDir0[0], lDir0[1], lDir0[2]);
       lDirValues.push(lDir1[0], lDir1[1], lDir1[2]);
-      sphereCoords = [0., 0., -3., .25, Math.sin(time), Math.cos(time), -5 + Math.sin(time), .18];
+      sphereCoords = [0., 0., -3., .30, Math.sin(time), Math.cos(time), -3 + Math.sin(time), .12];
       // HERE WE ARE SETTING SOME UNIFORM VARIABLES THAT THE LIBRARY DOES NOT KNOW ABOUT.
 
       gl.uniform3fv(uVar('uLDir')   , lDirValues); // Set light directions uniform variable.
@@ -215,7 +215,7 @@
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
 
-      for (int i = 0 ; i < 20 ; i++)
+      for (int i = 0 ; i < 1 ; i++)
          if (i < uNLights) {
             if (isInShadow(point + .01, uLDir[0], 1)) {
                shade = uAmbientColor;
