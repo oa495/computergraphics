@@ -1,46 +1,11 @@
+<canvas id="canvas1" width="400" height="400"></canvas>
+<canvas id="canvas2" width="400" height="400"></canvas>
 
-<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
-<big>HTML5 Canvas Reference is here</big></a></b>
+<script src="drawlib1.js"></script>
 
-<!! THIS IS AN EXAMPLE OF A HOMEWORK DOCUMENT THAT CONTAINS CANVAS BASED GRAPHICS.
-    YOU SHOULD PROBABLY CHANGE THE TEXT TO SOMETHING THAT DESCRIBES YOUR OWN WORK.>
-
-<p>
-Here is my cool homework, and these are my
-most excellent examples:
-<p>
-<center>
-<table>
-<tr>
-<td>
-<center>
-<canvas id=canvas1 width=400 height=400></canvas>
-<p>
-<i>This is one example of a 2D canvas.</i>
-</center>
-</td>
-<td width=50></td>
-<td>
-<center>
-<canvas id=canvas2 width=400 height=400></canvas>
-<p>
-<i>This is another example of a 2D canvas.</i>
-</center>
-</td>
-</tr>
-</table>
-<p>
-</center>
-<p>
-Aren't they wonderful? :-)
-
-<script src=drawlib1.js></script>
-
-<!! BELOW IS THE CONTENT WE DEVELOPED IN TUESDAY'S CLASS.>
 
 <script>
    var canvas;
-
    canvas = initCanvas('canvas1');
    canvas.update = function(g) {
       var x = this.cursor.x,
