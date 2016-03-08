@@ -23,8 +23,8 @@
    // MAINTAIN AN ARRAY OF LIGHT DIRECTION VALUES.
 
    var lDirValues;
-   var specular = [.5, .5, .5];
-   var ambient = [.1, .1, .1];
+   var specular = [.5, .2, .5];
+   var ambient = [.1, .0, .4];
    var diffuse = [.2, .2, .1];
    var specularPower = 20.;
    var nSpheres = 2;
@@ -37,15 +37,15 @@
 
       var x = 1;//Math.sin(Math.PI * time);
 
-      var lDir0 = [x,1,1];
-      var lDir1 = [-1,-1,-1];
+      var lDir0 = [x,0.5,1];
+      var lDir1 = [-1,-2,-1];
       normalize(lDir0);
       normalize(lDir1);
 
       lDirValues = [];
       lDirValues.push(lDir0[0], lDir0[1], lDir0[2]);
       lDirValues.push(lDir1[0], lDir1[1], lDir1[2]);
-      sphereCoords = [0., 0., -3., .30, Math.sin(time), Math.cos(time), -3 + Math.sin(time), .12];
+      sphereCoords = [0., 0., -3., .35, Math.sin(time), Math.cos(time), -3 + Math.sin(time), .12];
       // HERE WE ARE SETTING SOME UNIFORM VARIABLES THAT THE LIBRARY DOES NOT KNOW ABOUT.
 
       gl.uniform3fv(uVar('uLDir')   , lDirValues); // Set light directions uniform variable.
@@ -113,18 +113,18 @@
    float fractal(vec3 P) {
       float f = 0., s = 1.;
       for (int i = 0 ; i < 9 ; i++) {
-         f += noise(s * P) / s;
+         f *= noise(s * P) / s;
          s *= 2.;
          P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
       }
       return f;
    }
    float turbulence(vec3 P) {
-      float f = 0., s = 1.;
+      float f = 0., s = .2;
       for (int i = 0 ; i < 9 ; i++) {
-         f += abs(noise(s * P)) / s;
+         f = abs(noise(s * P)) / s;
          s *= 2.;
-         P = vec3(.866 * P.x + .5 * P.z, P.y + 100., -.5 * P.x + .866 * P.z);
+         P = vec3(.866 * P.x + .15 * P.z, P.y + 85., -.5 * P.x + .822 * P.z);
       }
       return f;
    }
@@ -187,7 +187,7 @@
    vec3 shadeSphere(vec3 point, vec3 W, vec4 sphere) {
       vec3 normal = (point - sphere.xyz) / sphere.w;
 
-      float c = cos(.3 * uTime), s = sin(.3 * uTime);
+      float c = atan(.3 * uTime), s = sin(.3 * uTime);
       vec3 p = vec3(c * normal.x - s * normal.z, normal.y, s * normal.x + c * normal.z);
 
       //vec3 shade = ambient * (1. - 10. * turbulence(5. * normal + vec3(0.,0.,uTime)));
@@ -205,13 +205,13 @@
 
       // MODULATE SPECULARITY BY EROSION TEXTURE.
 
-      vec3 shininess = max(0., .5 + tt) * uSpecularColor;
+      vec3 shininess = max(0.8, .5 + tt) * uSpecularColor;
 
       //vec3 shade = ambient * mix(vec3(0.,0.,1.), vec3(1.,.5,0.), tt);
 
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
-
-      vec3 shade = uAmbientColor * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
+      float n = turbulence(8. * normal + vec3(.8, 1.5, uTime));
+      vec3 shade = uAmbientColor * mix(vec3(1.,2.,0.8), vec3(0.,0.005,1.), texture2(p + abs(sin(uTime))));
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
 
