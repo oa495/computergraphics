@@ -211,7 +211,7 @@
 
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
       float n = turbulence(8. * normal + vec3(.8, 1.5, uTime));
-      vec3 shade = uAmbientColor * mix(vec3(1.,2.,0.8), vec3(0.,0.005,1.), texture2(p + abs(sin(uTime))));
+      vec3 shade = uAmbientColor * mix(vec3(1.,2.,0.8), vec3(0.,0.005,1.), texture2(p + sin(uTime)));
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
 
