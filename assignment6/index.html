@@ -1,58 +1,69 @@
+<!DOCTYPE html>
+<html class="page-home">
+    <head>
+        <meta charset="utf-8"> 
+        <title>Omayeli Arenyeka</title>
+        <link rel="icon" type="image/png" href="images/logo.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="styles/styles.css">
+    </head>
+    <body>
+      <p>
+      Here is my next cool homework, and this is my even more excellent example:
+      <p>
 
-<p>
-Here is my next cool homework, and this is my even more excellent example:
-<p>
+      <center>
+      <table>
+      <tr>
+      <td>
+      <center>
+      <canvas id="canvas1" width="600" height="400"></canvas>
+      <p>
 
-<center>
-<table>
-<tr>
-<td>
-<center>
-<canvas id="canvas1" width="600" height="400"></canvas>
-<p>
+      <i>This is how I show off my cool Matrix class.</i>
 
-<i>This is how I show off my cool Matrix class.</i>
+      </center>
+      </td>
+      </tr>
+      </table>
+      <p>
+      </center>
+      <p>
 
-</center>
-</td>
-</tr>
-</table>
-<p>
-</center>
-<p>
+      <script src="utility.js"></script>
+      <script src="drawlib1.js"></script>
+      <script src="matrix.js"></script>
 
-<script src="utility.js"></script>
-<script src="drawlib1.js"></script>
-<script src="matrix.js"></script>
-
-<script>
-   var canvas;
-
-
-   // BELOW IS THE CODE WE WROTE ON THURSDAY TO TEST THE MATRIX CLASS.
-   // YOU NEED TO FINISH IMPLEMENTING THE MATRIX CLASS, AND THEN
-   // CREATE AN ANIMATED GRAPHICAL SCENE TO DEMONSTRATE YOUR WORK.
-   // YOU SHOULD USE BOTH THE time AND this.cursor VARIABLES.
-
-   var matrix = new Matrix();
-
-   matrix.identity();
-   matrix.translate(1, 0, 0);
-   matrix.translate(2, 3, 0);
-
-   console.log(matrix.toString());
-
-   var srcVec = new Vector3(10, 0, 0);
-   var dstVec = new Vector3(0, 0, 0);
-   matrix.transform(srcVec, dstVec);
-   console.log(dstVec.toString());
+      <script>
+         var canvas;
 
 
-   canvas = initCanvas('canvas1');
-   canvas.update = function(g) {
+         // BELOW IS THE CODE WE WROTE ON THURSDAY TO TEST THE MATRIX CLASS.
+         // YOU NEED TO FINISH IMPLEMENTING THE MATRIX CLASS, AND THEN
+         // CREATE AN ANIMATED GRAPHICAL SCENE TO DEMONSTRATE YOUR WORK.
+         // YOU SHOULD USE BOTH THE time AND this.cursor VARIABLES.
 
-      // YOU ARE GOING TO REPLACE THE CODE BELOW.
+         var matrix = new Matrix();
 
-   }
-</script>
+         matrix.identity();
+         matrix.translate(1, 0, 0);
+         matrix.translate(2, 3, 0);
+
+         console.log(matrix.toString());
+
+         var srcVec = new Vector3(10, 0, 0);
+         var dstVec = new Vector3(0, 0, 0);
+         matrix.transform(srcVec, dstVec);
+         console.log(dstVec.toString());
+
+
+         canvas = initCanvas('canvas1');
+         canvas.update = function(g) {
+
+            // YOU ARE GOING TO REPLACE THE CODE BELOW.
+
+         }
+      </script>
+   </body>
+</html>
 
