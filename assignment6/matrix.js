@@ -45,6 +45,21 @@ Matrix.prototype = {
       this._makeTranslation(this._tmp1, x, y, z);
       this._multiply(this._tmp1);
    },
+   rotateX: function() {
+
+   }, 
+   rotateY: function() {
+
+   }, 
+   rotateZ: function() {
+
+   }, 
+   scale: function() {
+
+   }, 
+   perspective: function() {
+
+   },
 
    //////////////////////// INTERNAL METHODS ////////////////////////////
 
