@@ -45,19 +45,89 @@ Matrix.prototype = {
       this._makeTranslation(this._tmp1, x, y, z);
       this._multiply(this._tmp1);
    },
-   rotateX: function() {
+   rotateX: function(src, dst, angle) {
+      this._makeIdentity(this._tmp1);
+      var cos = Math.cos(angle);
+      var sin = Math.sin(angle);
+      this._tmp1[1][1] = cos;
+      this._tmp1[1][2] = -sin;
+      this._tmp1[2][1] = sin;
+      this._tmp1[2][2] = cos;
+      this._multiply(this._tmp1);
+
+      var A = this._tmp1,
+          x = src.x,
+          y = src.y,
+     z = src.z,
+     w = src.w !== undefined ? src.w : 1;
+      dst.x = A[0][0] * x + A[0][1] * y + A[0][2] * z + A[0][3] * w;
+      dst.y = A[1][0] * x + A[1][1] * y + A[1][2] * z + A[1][3] * w;
+      dst.z = A[2][0] * x + A[2][1] * y + A[2][2] * z + A[2][3] * w;
+      if (dst.w !== undefined)
+         dst.w = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
 
    }, 
-   rotateY: function() {
+   rotateY: function(src, dst, angle) {
+      this._makeIdentity(this._tmp1);
+      var cos = Math.cos(angle);
+      var sin = Math.sin(angle);
+      this._tmp1[0][0] = cos;
+      this._tmp1[0][2] = sin;
+      this._tmp1[2][0] = -sin;
+      this._tmp1[2][2] = cos;
+      this._multiply(this._tmp1);
 
+      var A = this._data,
+          x = src.x,
+          y = src.y,
+     z = src.z,
+     w = src.w !== undefined ? src.w : 1;
+      dst.x = A[0][0] * x + A[0][1] * y + A[0][2] * z + A[0][3] * w;
+      dst.y = A[1][0] * x + A[1][1] * y + A[1][2] * z + A[1][3] * w;
+      dst.z = A[2][0] * x + A[2][1] * y + A[2][2] * z + A[2][3] * w;
+      if (dst.w !== undefined)
+         dst.w = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
    }, 
-   rotateZ: function() {
+   rotateZ: function(src, dst, angle) {
+      this._makeIdentity(this._tmp1);
+      var cos = Math.cos(angle);
+      var sin = Math.sin(angle);
+      this._tmp1[0][0] = cos;
+      this._tmp1[0][1] = -sin;
+      this._tmp1[1][0] = sin;
+      this._tmp1[1][1] = cos;
+      this._multiply(this._tmp1);
 
+      var A = this._data,
+          x = src.x,
+          y = src.y,
+     z = src.z,
+     w = src.w !== undefined ? src.w : 1;
+      dst.x = A[0][0] * x + A[0][1] * y + A[0][2] * z + A[0][3] * w;
+      dst.y = A[1][0] * x + A[1][1] * y + A[1][2] * z + A[1][3] * w;
+      dst.z = A[2][0] * x + A[2][1] * y + A[2][2] * z + A[2][3] * w;
+      if (dst.w !== undefined)
+         dst.w = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
    }, 
-   scale: function() {
+   scale: function(src, dst, x, y, z) {
+      this._makeIdentity(this._tmp1);
+      this._tmp1[0][0] = x;
+      this._tmp1[1][1] = y;
+      this._tmp1[2][2] = z;
+      this._multiply(this._tmp1);
 
+      var A = this._data,
+          x = src.x,
+          y = src.y,
+     z = src.z,
+     w = src.w !== undefined ? src.w : 1;
+      dst.x = A[0][0] * x + A[0][1] * y + A[0][2] * z + A[0][3] * w;
+      dst.y = A[1][0] * x + A[1][1] * y + A[1][2] * z + A[1][3] * w;
+      dst.z = A[2][0] * x + A[2][1] * y + A[2][2] * z + A[2][3] * w;
+      if (dst.w !== undefined)
+         dst.w = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
    }, 
-   perspective: function() {
+   perspective: function(src, dst, x, y, z) {
 
    },
 
