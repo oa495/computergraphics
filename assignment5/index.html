@@ -77,9 +77,7 @@
          this.opacity = opacity;
          this.draw = function() {
             context.globalOpacity = this.opacity;
-            context.beginPath();
-            context.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
-            context.closePath();
+            ctx.fillRect(this.x, this.y, this.size, this.size);
             context.fillStyle = this.color;
             context.fill();
          };

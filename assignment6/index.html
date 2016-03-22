@@ -8,41 +8,32 @@
         <link rel="stylesheet" type="text/css" href="styles/styles.css">
     </head>
     <body>
-      <p>
-      Here is my next cool homework, and this is my even more excellent example:
-      <p>
-
       <center>
-      <table>
-      <tr>
-      <td>
-      <center>
-      <canvas id="canvas1" width="600" height="400"></canvas>
-      <p>
-
-      <i>This is how I show off my cool Matrix class.</i>
-
-      </center>
-      </td>
-      </tr>
-      </table>
-      <p>
-      </center>
-      <p>
+       <table>
+          <tr>
+             <td>
+                <center>
+                   <canvas id="canvas1" width="400" height="400"></canvas>
+                   <p><input  oninput="addCircles(this.value)" onchange="addCircles(this.value)" type="range" id="myRange" value="0" min="0" max="10"></p>
+                </center>
+             </td>
+       </table>
 
       <script src="utility.js"></script>
       <script src="drawlib1.js"></script>
       <script src="matrix.js"></script>
 
+      <style type="text/css">
+         * {
+            margin: 0;
+            padding: 0;
+         }
+         #canvas1 {
+            background: #E1F5C4;
+         }
+      </style>
+
       <script>
-         var canvas;
-
-
-         // BELOW IS THE CODE WE WROTE ON THURSDAY TO TEST THE MATRIX CLASS.
-         // YOU NEED TO FINISH IMPLEMENTING THE MATRIX CLASS, AND THEN
-         // CREATE AN ANIMATED GRAPHICAL SCENE TO DEMONSTRATE YOUR WORK.
-         // YOU SHOULD USE BOTH THE time AND this.cursor VARIABLES.
-
          var matrix = new Matrix();
 
          matrix.identity();
@@ -55,15 +46,71 @@
          var dstVec = new Vector3(0, 0, 0);
          matrix.transform(srcVec, dstVec);
          console.log(dstVec.toString());
+         //////////////
 
-
-         canvas = initCanvas('canvas1');
-         canvas.update = function(g) {
-
-            // YOU ARE GOING TO REPLACE THE CODE BELOW.
-
+         var canvas1 = document.getElementById('canvas1');
+         var circles = [];
+         var largeCircle;
+         var ctx;
+         if (canvas1.getContext){
+           ctx = canvas1.getContext('2d');
+           largeCircle = new Circle(canvas1, ctx, "#FF4E50", 1, 10, canvas1.width/2, canvas1.height/2, 5);
+           largeCircle.draw();
+           drawCircle();
          }
-      </script>
+
+         function addCircles(no) {
+            circles = [];
+            var size;
+            for (var i = 0; i < no; i++) {
+                  size = Math.random()*4;
+               circles.push(new Circle(canvas1, ctx, getColor(), 1, size, canvas1.width/2, canvas1.height/2, Math.floor(Math.random()*5)));
+            }
+         }
+         function drawCircle() {
+            ctx.clearRect(0, 0, canvas1.width, canvas1.height);
+            largeCircle.move();
+            largeCircle.draw();
+            for (var j = 0; j < circles.length; j++) {
+                 circles[j].draw();
+                 circles[j].move();
+            }
+            requestAnimationFrame(drawCircle);
+         }
+         function getColor() {
+            var colors = ['#FC913A', '#F9D423', '#EDE574', '#CCF390', '#E0E05A', '#F7C41F', '#FEE5AD', '#F45D4C'];
+            return colors[Math.floor(Math.random() * colors.length)];   
+         }
+         function Circle(canvas, context, color, opacity, size, x, y, increment) {
+               this.x = x; 
+               this.y = y;
+               this.increment = increment;
+               this.originalSize = size;
+               this.size = size;
+               this.color = color;
+               this.opacity = opacity;
+               this.draw = function() {
+                  context.globalOpacity = this.opacity;
+                  ctx.fillRect(this.x, this.y, this.size, this.size);
+                  context.fillStyle = this.color;
+                  context.fill();
+               };
+               this.move = function() {
+                     this.size += this.increment;
+                     this.opacity -= Math.random();
+                     if (this.size > canvas.width-100 || this.size > canvas.height-100) {
+                        this.reset();
+                     }
+                     else {
+                        this.draw();
+                     }
+               };
+               this.reset = function() {
+                  this.size = this.originalSize;
+                  this.draw();
+               };
+         }
+      </script> 
    </body>
 </html>
 
