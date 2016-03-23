@@ -13,7 +13,7 @@
           <tr>
              <td>
                 <center>
-                   <canvas id="canvas1" width="400" height="400"></canvas>
+                   <canvas id="canvas1" width="600" height="400"></canvas>
                    <p><input  oninput="addCircles(this.value)" onchange="addCircles(this.value)" type="range" id="myRange" value="0" min="0" max="10"></p>
                 </center>
              </td>
@@ -34,6 +34,10 @@
       </style>
 
       <script>
+      var canvas1 = initCanvas('canvas1');
+      var width = canvas1.width;
+      var height = canvas1.height;
+
          var matrix = new Matrix();
 
          matrix.identity();
@@ -48,67 +52,10 @@
          console.log(dstVec.toString());
          //////////////
 
-         var canvas1 = document.getElementById('canvas1');
-         var circles = [];
-         var largeCircle;
-         var ctx;
-         if (canvas1.getContext){
-           ctx = canvas1.getContext('2d');
-           largeCircle = new Circle(canvas1, ctx, "#FF4E50", 1, 10, canvas1.width/2, canvas1.height/2, 5);
-           largeCircle.draw();
-           drawCircle();
-         }
-
-         function addCircles(no) {
-            circles = [];
-            var size;
-            for (var i = 0; i < no; i++) {
-                  size = Math.random()*4;
-               circles.push(new Circle(canvas1, ctx, getColor(), 1, size, canvas1.width/2, canvas1.height/2, Math.floor(Math.random()*5)));
-            }
-         }
-         function drawCircle() {
-            ctx.clearRect(0, 0, canvas1.width, canvas1.height);
-            largeCircle.move();
-            largeCircle.draw();
-            for (var j = 0; j < circles.length; j++) {
-                 circles[j].draw();
-                 circles[j].move();
-            }
-            requestAnimationFrame(drawCircle);
-         }
-         function getColor() {
-            var colors = ['#FC913A', '#F9D423', '#EDE574', '#CCF390', '#E0E05A', '#F7C41F', '#FEE5AD', '#F45D4C'];
-            return colors[Math.floor(Math.random() * colors.length)];   
-         }
-         function Circle(canvas, context, color, opacity, size, x, y, increment) {
+         function Sphere(x, y, z) {
                this.x = x; 
                this.y = y;
-               this.increment = increment;
-               this.originalSize = size;
-               this.size = size;
-               this.color = color;
-               this.opacity = opacity;
-               this.draw = function() {
-                  context.globalOpacity = this.opacity;
-                  ctx.fillRect(this.x, this.y, this.size, this.size);
-                  context.fillStyle = this.color;
-                  context.fill();
-               };
-               this.move = function() {
-                     this.size += this.increment;
-                     this.opacity -= Math.random();
-                     if (this.size > canvas.width-100 || this.size > canvas.height-100) {
-                        this.reset();
-                     }
-                     else {
-                        this.draw();
-                     }
-               };
-               this.reset = function() {
-                  this.size = this.originalSize;
-                  this.draw();
-               };
+               this.z = z;
          }
       </script> 
    </body>

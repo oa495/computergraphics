@@ -44,13 +44,20 @@
       circles = [];
       var size;
       for (var i = 0; i < no; i++) {
-         /*if (circles[i-1]) {
-            size = circles[i-1].size- Math.abs(Math.random() * circles[i-1].size);
-         }
-         else {*/
             size = Math.random()*4;
-         //}
          circles.push(new Circle(canvas1, ctx, getColor(), 1, size, canvas1.width/2, canvas1.height/2, Math.floor(Math.random()*5)));
+      }
+      for (var i = 0; i < no; i++) {
+            size = Math.random()*4;
+         circles.push(new Circle(canvas1, ctx, getColor(), 1, size, 0, canvas1.height/2, Math.floor(Math.random()*5)));
+      }
+      for (var i = 0; i < no; i++) {
+            size = Math.random()*4;
+         circles.push(new Circle(canvas1, ctx, getColor(), 1, size, canvas1.width/2, 0, Math.floor(Math.random()*5)));
+      }
+      for (var i = 0; i < no; i++) {
+            size = Math.random()*4;
+         circles.push(new Circle(canvas1, ctx, getColor(), 1, size, 0, 0, Math.floor(Math.random()*5)));
       }
    }
    function drawCircle() {
@@ -70,6 +77,7 @@
    function Circle(canvas, context, color, opacity, size, x, y, increment) {
          this.x = x; 
          this.y = y;
+         
          this.increment = increment;
          this.originalSize = size;
          this.size = size;
@@ -84,7 +92,7 @@
          this.move = function() {
                this.size += this.increment;
                this.opacity -= Math.random();
-               if (this.size > canvas.width-100 || this.size > canvas.height-100) {
+               if (this.size > canvas.width || this.size > canvas.height) {
                   this.reset();
                }
                else {
