@@ -38,6 +38,18 @@
       var width = canvas1.width;
       var height = canvas1.height;
 
+      var vertices = [
+          new Point(-1,1,-1),
+          new Point(1,1,-1),
+          new Point(1,-1,-1),
+          new Point(-1,-1,-1),
+          new Point(-1,1,1),
+          new Point(1,1,1),
+          new Point(1,-1,1),
+          new Point(-1,-1,1)
+      ];
+
+
          var matrix = new Matrix();
 
          matrix.identity();
@@ -52,7 +64,7 @@
          console.log(dstVec.toString());
          //////////////
 
-         function Sphere(x, y, z) {
+         function Point(x, y, z) {
                this.x = x; 
                this.y = y;
                this.z = z;
