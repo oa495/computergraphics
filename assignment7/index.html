@@ -1,14 +1,132 @@
-<font face=helvetica>
-<b>EXAMPLES FROM MARCH 24 CLASS:</b>
-<blockquote>
-<table cellspacing=10>
-<tr><td><a href=flapping.html>flapping.html</td>
-    <td>// FLAPPING</a></td></tr>
-<tr><td><a href=running.html>running.html</td>
-    <td>// RUNNING</a></td></tr>
-<tr><td><a href=perspective.html>perspective.html</td>
-    <td>// ONE SQUARE WITH X PERSPECTIVE</a></td></tr>
-<tr><td><a href=squares.html>squares.html</td>
-    <td>// TWO SQUARES WITH Z PERSPECTIVE</a></td></tr>
-</table>
-</blockquote>
+<!DOCTYPE html>
+<html class="page-home">
+    <head>
+        <meta charset="utf-8"> 
+        <title>Omayeli Arenyeka</title>
+        <link rel="icon" type="image/png" href="images/logo.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="styles/styles.css">
+    </head>
+    <body>
+    <p></p>
+    <center>
+      <table>
+         <tr>
+            <td>
+               <center>
+                  <canvas id="canvas1" width=400 height=400></canvas>
+               </center>
+            </td>
+         </tr>
+      </table>
+   </center>
+   <script src="utility.js"></script>
+   <script src="drawlib1.js"></script>
+   <script src="matrix.js"></script>
+   <script>
+      var canvas;
+      var matrix = new Matrix();
+      var pt0 = new Vector3(-1, 0, 0);
+      var pt1 = new Vector3( 1, 0, 0);
+      var tmp = new Vector3( 0, 0, 0);
+      var pix0 = new Vector3(0, 0, 0);
+      var pix1 = new Vector3(0, 0, 0);
+      function moveTo(x, y, z) {
+         pt0.set(x, y, z);
+         matrix.transform(pt0, tmp);
+         tmp.viewportTransform(width, height, pix0);
+         g.moveTo(pix0.x, pix0.y);
+      }
+      function lineTo(x, y, z) {
+         pt0.set(x, y, z);
+         matrix.transform(pt0, tmp);
+         tmp.viewportTransform(width, height, pix0);
+         g.lineTo(pix0.x, pix0.y);
+      }
+      var g;
+      var width;
+      var height;
+      var legs = [];
+
+      function makeLegs(){
+         for (var n= 0; n < 4; n++){
+            legs[n] = {
+               x: 0,
+               y: 0,
+               z: Math.random() * 9 - 10,
+               offset: Math.random() * 2
+            }
+         }
+      }
+
+      makeLegs();
+      canvas = initCanvas('canvas1');
+      canvas.update = function(_g) {
+         g = _g;
+         width = canvas.width;
+         height = canvas.height;
+
+         // OUTLINE AROUN  D CANVAS
+         g.lineWidth = 2;
+         g.strokeStyle = 'black';
+         g.fillStyle = 'black';
+         g.beginPath();
+         g.moveTo(0, 0);
+         g.lineTo(width, 0);
+         g.lineTo(width, height);
+         g.lineTo(0, height);
+         g.lineTo(0, 0);
+         g.stroke();
+         
+         //spider web
+         g.lineWidth = 0.5;
+         g.strokeStyle = 'black';
+         g.fillStyle = 'black';
+         g.beginPath();
+         g.moveTo(width/2, 0);
+         g.lineTo(width/2, height/2);
+
+         g.stroke();
+
+
+         g.beginPath();
+         g.arc(width/2,height/2,30,0,Math.PI*2,true); // Outer circle
+         g.fill();
+         g.stroke();
+
+         for (var i = 0; i < legs.length; i++){
+            for (var side = -1 ; side <= 1 ; side += 2) {
+               var angle1 =  .3 + .7 * Math.cos(3 * time * 1 + legs[i].offset) * 2;
+               var angle2 = -.5 + .5 * Math.sin(3 * time * 1.5 + legs[i].offset) * 2;
+               var angle3 = -.5 + .5 * Math.tan(3 * time * 1 + legs[i].offset) * 2;
+
+               matrix.identity();
+               g.lineJoin = 'round';
+               g.lineCap = 'round';
+               g.beginPath();
+               
+               matrix.translate(legs[i].x, legs[i].y + Math.sin(time + legs[i].offset) / 8, legs[i].z); 
+               
+               moveTo( 0, 0, legs[i].z);
+               matrix.rotateZ(angle1 * side);
+               matrix.translate( .3 * side, 0, 0);
+
+               lineTo( 0, 0, 0);
+
+               matrix.rotateZ(angle2 * side);
+               matrix.translate( .3 * side, 0, 0);
+
+               lineTo( 0, 0, 0);
+
+               matrix.rotateZ(angle1 * side);
+               matrix.translate( .1 * side, 0, 0);
+
+               lineTo( 0, 0, 0);
+
+               g.lineWidth = 3;
+               g.strokeStyle = 'black';
+               g.stroke();
+            }
+         }
+      }
+   </script>
