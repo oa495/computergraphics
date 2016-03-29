@@ -14,7 +14,6 @@
              <td>
                 <center>
                    <canvas id="canvas1" width="600" height="400"></canvas>
-                   <p><input  oninput="addCircles(this.value)" onchange="addCircles(this.value)" type="range" id="myRange" value="0" min="0" max="10"></p>
                 </center>
              </td>
        </table>
@@ -34,41 +33,75 @@
       </style>
 
       <script>
-      var canvas1 = initCanvas('canvas1');
-      var width = canvas1.width;
-      var height = canvas1.height;
+            var canvas;
+            var matrix = new Matrix();
+            var pt0 = new Vector3(-1, 0, 0);
+            var pt1 = new Vector3( 1, 0, 0);
+            var tmp = new Vector3( 0, 0, 0);
+            var pix0 = new Vector3(0, 0, 0);
+            var pix1 = new Vector3(0, 0, 0);
+            function moveTo(x, y, z) {
+               pt0.set(x, y, z);
+               matrix.transform(pt0, tmp);
+               tmp.viewportTransform(width, height, pix0);
+               g.moveTo(pix0.x, pix0.y);
+            }
+            function lineTo(x, y, z) {
+               pt0.set(x, y, z);
+               matrix.transform(pt0, tmp);
+               tmp.viewportTransform(width, height, pix0);
+               g.lineTo(pix0.x, pix0.y);
+            }
+            var g;
+            var width;
+            var height;
+            var squares = [];
 
-      var vertices = [
-          new Point(-1,1,-1),
-          new Point(1,1,-1),
-          new Point(1,-1,-1),
-          new Point(-1,-1,-1),
-          new Point(-1,1,1),
-          new Point(1,1,1),
-          new Point(1,-1,1),
-          new Point(-1,-1,1)
-      ];
+            function makeSquare(){
+                  g.strokeStyle = getColor();
+                  g.beginPath();
+                  moveTo(-1,-1, 0);
+                  lineTo( 1,-1, 0);
+                  lineTo( 1, 1, 0);
+                  lineTo(-1, 1, 0);
+                  lineTo(-1,-1, 0);
+                  g.lineWidth = 16;
+                  g.stroke();
+            }
+             function getColor() {
+                var colors = ['#FC913A', '#F9D423', '#EDE574', '#CCF390', '#E0E05A', '#F7C41F', '#FEE5AD', '#F45D4C'];
+                return colors[Math.floor(Math.random() * colors.length)];   
+             }
 
+            canvas = initCanvas('canvas1');
+             canvas.update = function(_g) {
+                g = _g;
+                width = canvas.width;
+                height = canvas.height;
 
-         var matrix = new Matrix();
+                // OUTLINE AROUND CANVAS
 
-         matrix.identity();
-         matrix.translate(1, 0, 0);
-         matrix.translate(2, 3, 0);
+                g.lineWidth = 2;
+                g.strokeStyle = 'black';
+                g.beginPath();
+                g.moveTo(0, 0);
+                g.lineTo(width, 0);
+                g.lineTo(width, height);
+                g.lineTo(0, height);
+                g.lineTo(0, 0);
+                g.stroke();
 
-         console.log(matrix.toString());
+                for (var n= 0; n < 4; n++){
+                  matrix.identity();
+                  matrix.scale(.3);
+                  matrix.perspective(0, 0, -.2);
+                  matrix.rotateY(.2 * Math.sin(6 * time));
 
-         var srcVec = new Vector3(10, 0, 0);
-         var dstVec = new Vector3(0, 0, 0);
-         matrix.transform(srcVec, dstVec);
-         console.log(dstVec.toString());
-         //////////////
+                  matrix.translate(0, 0, Math.random() * 4 - 2);
+                  makeSquare();
+                }
+             }
 
-         function Point(x, y, z) {
-               this.x = x; 
-               this.y = y;
-               this.z = z;
-         }
       </script> 
    </body>
 </html>
