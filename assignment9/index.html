@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="page-home">
+    <head>
+        <meta charset="utf-8"> 
+        <title>Omayeli Arenyeka</title>
+    </head>
+    <body>
+      <p></p>
+      <center>
+        <table>
+           <tr>
+              <td>
+                 <center>
+                    <canvas id="canvas1" width="600" height="600"></canvas>
+                 </center>
+              </td>
+           </tr>
+        </table>
+     </center>
+     <script src="utility.js"></script>
+     <script src="drawlib1.js"></script>
+     <script src="matrix.js"></script>
+    <script>
+       var canvas;
+       canvas = initCanvas('canvas1');
+
+       function drawHermiteCurve(A, B, C, D) {
+          var M = [[ 2,-2, 1, 1], 
+                         [-3, 3,-2,-1], 
+                         [ 0, 0, 1, 0], 
+                         [ 1, 0, 0, 0]];
+          //Multiply ABCD vector with matrix to find tVec for cubic
+          var input = [A, B, C, D];
+          var tVec = vecMultiply(M, input);
+          var curve = [];
+          for (var t = 0; t <=1; t += 0.01){
+             curve.push(cubic(tVec,t));
+          }
+          return curve;
+       }
+
+       function drawBezierCurve(A, B, C, D) {
+          var M = [[-1, 3,-3, 1], 
+                         [ 3,-6, 3, 0], 
+                         [-3, 3, 0, 0], 
+                         [ 1, 0, 0, 0]];
+          //Multiply ABCD vector with matrix to find tVec for cubic
+          var input = [A, B, C, D];
+          var tVec = vecMultiply(M, input);
+          var curve = [];
+          for (var t = 0; t <= 1; t += 0.01){
+             curve.push(cubic(tVec, t));
+          }
+          return curve;
+       }
+       function cubic(tVec, t) {
+          return (tVec[0] * Math.pow(t,3) + tVec[1] * Math.pow(t,2) + 
+                   tVec[2] * t + tVec[3]);
+       }
+       function vecMultiply(matrix, vector) {
+          var result = [];
+          result[0] = matrix[0][0]*vector[0] + matrix[0][1]*vector[1] + 
+                      matrix[0][2]*vector[2] + matrix[0][3]*vector[3];
+          result[1] = matrix[1][0]*vector[0] + matrix[1][1]*vector[1] + 
+                      matrix[1][2]*vector[2] + matrix[1][3]*vector[3];
+          result[2] = matrix[2][0]*vector[0] + matrix[2][1]*vector[1] + 
+                      matrix[2][2]*vector[2] + matrix[2][3]*vector[3];
+          result[3] = matrix[3][0]*vector[0] + matrix[3][1]*vector[1] + 
+                      matrix[3][2]*vector[2] + matrix[3][3]*vector[3];
+          return result;
+       }
+       function getPoint(matrix, matrixPoint, dst) {
+          var tmp = new Vector3(0, 0, 0);
+          matrix.transform(matrixPoint,tmp);
+          tmp.viewportTransform(canvas.width,canvas.height,dst);
+       }
+
+       canvas.update = function(g) {
+          var x = this.cursor.x,
+              y = this.cursor.y;
+
+         width = canvas.width;
+         height = canvas.height;
+
+         // OUTLINE AROUN  D CANVAS
+         g.lineWidth = 2;
+         g.strokeStyle = 'black';
+         g.fillStyle = 'black';
+         g.beginPath();
+         g.moveTo(0, 0);
+         g.lineTo(width, 0);
+         g.lineTo(width, height);
+         g.lineTo(0, height);
+         g.lineTo(0, 0);
+         g.stroke();
+
+          var matrix = new Matrix();
+          matrix.identity();
+
+          var bxCurve = drawBezierCurve(-1, -0.5, 0, 1);
+          var byCurve = drawBezierCurve(-1, -0.5, 0, 1);
+          var hxCurve = drawHermiteCurve(-0.5, 0.5, 1, 0);
+          var hyCurve = drawHermiteCurve(-0.5, 0.5, 0, 0);
+
+          var mp = new Vector3(0, 0, 0);
+          var px = new Vector3(0, 0, 0);
+          mp.x = bxCurve[Math.floor(time*50%100)];
+          mp.y = byCurve[Math.floor(time*50%100)];
+          getPoint(matrix, mp, px);
+          matrix.translate(mp.x, mp.y, 0);
+
+          var mp = new Vector3(0,0,0);
+          var px = new Vector3(0,0,0);
+          mp.x = hxCurve[Math.floor(time*180%100)];
+          getPoint(matrix, mp, px);
+          matrix.rotateY(mp.x * 4);
+          //HAND
+
+          var fRTL = new Vector3(-0.12,-0.2,0);
+          var fRBR = new Vector3(-0.06, 0.1, 0);
+          var fRBL = new Vector3(-0.12,0.1,0);
+          var fRTR = new Vector3(-0.06,-0.2,0);
+
+          var fingerTL = new Vector3(0,0,0);
+          var fingerTR = new Vector3(0,0,0);
+          var fingerBL = new Vector3(0,0,0);
+          var fingerBR = new Vector3(0,0,0);
+
+          getPoint(matrix, fRTL, fingerTL);
+          getPoint(matrix, fRTR, fingerTR);
+          getPoint(matrix, fRBL, fingerBL);
+          getPoint(matrix, fRBR, fingerBR);
+          g.beginPath();
+          g.moveTo(fingerTL.x, fingerTL.y);
+          g.bezierCurveTo(fingerBL.x, fingerBL.y, fingerBR.x, fingerBR.y,
+                            fingerTR.x, fingerTR.y);
+
+           g.moveTo(fingerTL.x, fingerTL.y);
+           g.lineTo(fingerTL.x + 8, fingerTL.y+45);
+           g.stroke();
+
+          var fLBL = new Vector3(-0.06,0.2,0);
+          var fLBR = new Vector3(0,0.2,0);
+          var fLTL = new Vector3(-0.06,-0.2,0);
+          var fLTR = new Vector3(0,-0.2,0);
+          
+          
+          var fingerTL = new Vector3(0,0,0);
+          var fingerTR = new Vector3(0,0,0);
+          var fingerBL = new Vector3(0,0,0);
+          var fingerBR = new Vector3(0,0,0);
+
+
+          getPoint(matrix, fLTL, fingerTL);
+          getPoint(matrix, fLTR, fingerTR);
+          getPoint(matrix, fLBL, fingerBL);
+          getPoint(matrix, fLBR, fingerBR);
+
+
+          g.beginPath();
+          g.moveTo(fingerTL.x, fingerTL.y);
+          g.bezierCurveTo(fingerBL.x, fingerBL.y, fingerBR.x, fingerBR.y,
+                            fingerTR.x, fingerTR.y);
+          g.stroke();
+
+          var fRBL = new Vector3(0,0.2,0);
+          var fRBR = new Vector3(0.06,0.2,0);
+          var fRTL = new Vector3(0,-0.2,0);
+          var fRTR = new Vector3(0.06,-0.2,0);
+
+          var fingerTL = new Vector3(0,0,0);
+          var fingerTR = new Vector3(0,0,0);
+          var fingerBL = new Vector3(0,0,0);
+          var fingerBR = new Vector3(0,0,0);
+
+          getPoint(matrix, fRTL, fingerTL);
+          getPoint(matrix, fRTR, fingerTR);
+          getPoint(matrix, fRBL, fingerBL);
+          getPoint(matrix, fRBR, fingerBR);
+
+          g.beginPath();
+          g.moveTo(fingerTL.x, fingerTL.y);
+          g.bezierCurveTo(fingerBL.x, fingerBL.y, fingerBR.x, fingerBR.y,
+                            fingerTR.x, fingerTR.y);
+
+          g.stroke();
+
+          var fRTL = new Vector3(0.06,-0.2,0);
+          var fRTR = new Vector3(0.12,-0.2, .06,0);
+          var fRBL = new Vector3(0.06,0.2,0);
+          var fRBR = new Vector3(0.12,0.2,0);
+
+          var fingerTL = new Vector3(0,0,0);
+          var fingerTR = new Vector3(0,0,0);
+          var fingerBL = new Vector3(0,0,0);
+          var fingerBR = new Vector3(0,0,0);
+          getPoint(matrix, fRTL, fingerTL);
+          getPoint(matrix, fRTR, fingerTR);
+          getPoint(matrix, fRBL, fingerBL);
+          getPoint(matrix, fRBR, fingerBR);
+
+          g.beginPath();
+          g.moveTo(fingerTL.x, fingerTL.y);
+          g.bezierCurveTo(fingerBL.x, fingerBL.y, fingerBR.x, fingerBR.y,
+                            fingerTR.x, fingerTR.y);
+
+          g.stroke();
+
+          var fRBL = new Vector3(0.12, 0.01,0);
+          var fRBR = new Vector3(0.18,0.01,0);
+          var fRTL = new Vector3(0.12,-0.2,0);
+          var fRTR = new Vector3(0.18,-0.2,0);
+
+          var fingerTL = new Vector3(0,0,0);
+          var fingerTR = new Vector3(0,0,0);
+          var fingerBL = new Vector3(0,0,0);
+          var fingerBR = new Vector3(0,0,0);
+
+          getPoint(matrix, fRTL, fingerTL);
+          getPoint(matrix, fRTR, fingerTR);
+          getPoint(matrix, fRBL, fingerBL);
+          getPoint(matrix, fRBR, fingerBR);
+
+          g.beginPath();
+          g.moveTo(fingerTL.x, fingerTL.y);
+          g.bezierCurveTo(fingerBL.x, fingerBL.y, fingerBR.x, fingerBR.y,
+                            fingerTR.x, fingerTR.y);
+
+
+          g.moveTo(fingerTR.x, fingerTR.y);
+          g.lineTo(fingerTR.x - 8, fingerTR.y+ 50);
+          g.stroke();
+          
+       }
+    </script>
+  </body>
+</html>
