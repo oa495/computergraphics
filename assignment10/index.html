@@ -1,0 +1,41 @@
+<script src=CT_Modeler.js></script>
+
+<body bgcolor=white>
+<center>
+<p>My attempt at making a fan.</p>   
+<canvas id='canvas1' width='480' height='480'></canvas>
+</center>
+</body>
+
+<script>
+   function getTime() { return (new Date()).getTime() / 1000; }
+
+   var scene = new CT.Scene(canvas1);
+   scene.setLight(0, [ 1, 1, 1]);
+   scene.setLight(1, [-1,-1,-1], [.1, .05, 0]);
+
+   var root = new CT.Node();
+   scene.add(root);
+
+
+   var shape1 = root.addChild(new CT.Torus(32,16,.6));
+
+   var shapes = [];
+    shapes.push(root.addChild(new CT.Cube()));
+   shapes.push(root.addChild(new CT.Sphere(16, 8)));
+   shapes.push(root.addChild(new CT.Cylinder(8)));
+   shapes.push(root.addChild(new CT.Disk(8)));
+   shapes.push(root.addChild(new CT.Torus(1, 2,8)));
+
+   var startTime = getTime();
+   (function update() {
+      CT.time = getTime() - startTime;
+
+      root.identity().rotateY(Math.sin(CT.time))
+		     .translate(-.5,0,0).rotateZ(Math.cos(CT.time)).scale(.3);
+      root.draw();
+
+      setTimeout(update, 1000 / 60);
+   })();
+</script>
+
